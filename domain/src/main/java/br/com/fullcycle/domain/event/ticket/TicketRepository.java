@@ -1,5 +1,8 @@
 package br.com.fullcycle.domain.event.ticket;
 
+import br.com.fullcycle.domain.event.EventId;
+
+import java.util.Collection;
 import java.util.Optional;
 
 public interface TicketRepository {
@@ -11,4 +14,6 @@ public interface TicketRepository {
     Ticket update(Ticket ticket);
 
     void deleteAll();
+
+    Collection<Ticket> ticketsByEventId(EventId eventId);
 }

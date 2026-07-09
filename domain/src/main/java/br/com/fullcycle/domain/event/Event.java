@@ -26,6 +26,7 @@ public class Event {
     private LocalDate date;
     private int totalSpots;
     private PartnerId partnerId;
+    private boolean cancelled;
 
     public Event(
             final EventId eventId,
@@ -50,6 +51,7 @@ public class Event {
         this.eventId = eventId;
         this.tickets = tickets != null ? tickets : new HashSet<>(0);
         this.domainEvents = new HashSet<>(2);
+        this.cancelled = false;
     }
 
     public static Event newEvent(final String name, final String date, final Integer totalSpots, final Partner partner) {
@@ -62,12 +64,19 @@ public class Event {
             final String date,
             final int totalSpots,
             final String partnerId,
-            final Set<EventTicket> tickets
+            final Set<EventTicket> tickets,
+            final boolean cancelled
     ) {
-        return new Event(EventId.with(id), name, date, totalSpots, PartnerId.with(partnerId), tickets);
+        final var event = new Event(EventId.with(id), name, date, totalSpots, PartnerId.with(partnerId), tickets);
+        event.cancelled = cancelled;
+        return event;
     }
 
     public EventTicket reserveTicket(final CustomerId aCustomerId) {
+        if (this.cancelled) {
+            throw new ValidationException("Event is cancelled");
+        }
+
         this.allTickets().stream()
                 .filter(it -> Objects.equals(it.customerId(), aCustomerId))
                 .findFirst()
@@ -114,6 +123,19 @@ public class Event {
 
     public Set<DomainEvent> allDomainEvents() {
         return Collections.unmodifiableSet(domainEvents);
+    }
+
+    public void cancel() {
+        if (this.cancelled) {
+            throw new ValidationException("Event is already cancelled");
+        }
+
+        this.cancelled = true;
+        this.domainEvents.add(new EventCancelled(eventId()));
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
     }
 
     @Override
