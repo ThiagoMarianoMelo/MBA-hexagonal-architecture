@@ -51,7 +51,7 @@ public class EventResolver {
     }
 
     @MutationMapping
-    public void cancelEvent(@Argument String id) {
-        cancelEventUseCase.execute(new CancelEventUseCase.Input(id));
+    public Boolean cancelEvent(@Argument String id) {
+        return cancelEventUseCase.execute(new CancelEventUseCase.Input(id)).success();
     }
 }
