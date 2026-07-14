@@ -24,12 +24,12 @@ public class CancelEventUseCase extends UseCase<CancelEventUseCase.Input, Cancel
 
         eventRepository.update(anEvent);
 
-        return new Output();
+        return new Output(true);
     }
 
     public record Input(String eventId) {
     }
 
-    public record Output() {
+    public record Output(boolean success) {
     }
 }
